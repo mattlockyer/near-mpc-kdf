@@ -1,0 +1,18 @@
+[package]
+name = "mpc-test"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "mpc-test"
+path = "src/lib.rs"
+
+[dependencies]
+hkdf = "0.12.4"
+k256 = { version = "0.13.1", features = ["sha256", "ecdsa", "serde"] }
+near-primitives = "0.20.1"
+near-crypto = "0.20.1"
+near-sdk = "5.0.0-alpha.1"
+sha2 = "0.10.8"
+hex = "0.4.3"
+ethereum-private-key-to-address = "0.1.0"
