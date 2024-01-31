@@ -2,11 +2,11 @@
 
 ## Concept Overview
 
-1. Using Rust project (or some JS/TS in the future) a client generates an Ethereum private key, address and sig `v` value (for ECDSA recovery).
+1. Using Rust project (or some JS/TS in the future) a client generates an Ethereum public key, address and sig `v` value (for ECDSA recovery).
 2. The client builds an Ethereum TX client side (Chain ID matters).
 3. The client calls `sign` with their near account.
 4. An indexer picks up the `response` transaction. The response contains the `big_r` and `s` values for the Ethereum TX.
-5. The client can build a signed and RLP encoded Ethereum TX with `v`, `r`, `s`, and broadcast it to an Ethereum network.
+5. The client can build a signed Ethereum TX with `v`, `r`, `s`, and broadcast it to an Ethereum network.
 
 ## Instructions
 *Steps 1 and 2 are already done for the current testnet contract, but this contract and your NEAR network may differ*
@@ -68,7 +68,7 @@ Example:
 }
 ```
 
-6. Create a new RLP encoded transaction like in step 1 & 2 (ethers.utils.RLP.encode([...])) but instead switch the last 3 values with:
+6. Create a new RLP encoded transaction like in step 1 & 2 (ethers.utils.RLP.encode([...])) but remove the last 3 values with:
 - `v (from rust project output)`
 ECDSA signature parts from MPC Contract Response
 - `big_r`
@@ -81,7 +81,7 @@ Some notes about final transaction, every piece is prefixed with a length in RLP
 Example: `ethers.provider.sendTransaction(YOUR_FULL_RLP_ENCODED_TX_IN_HEX)` (should have prefix 0x)
 
 ## WIP
-- Right now the focus is on Ethereum private keys and accounts (see output)
+- Right now the focus is on Ethereum
 
 ## TODO
 [] Add cli args

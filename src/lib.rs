@@ -8,8 +8,8 @@ use near_primitives::hash::CryptoHash;
 use near_primitives::types::AccountId;
 use sha2::{Digest, Sha256};
 use hex::encode;
-use ethereum_private_key_to_address::PrivateKey;
-
+use sha3::Keccak256;
+use ethereum_types::H160;
 
 pub mod types;
 pub mod util;
@@ -66,12 +66,10 @@ pub fn main() {
         0x03 => 1,
         _ => 0
     };
-    // dropping first byte 02 or 03 ignored by Bitcoin and Ethereum public key addresses
-    // https://github.com/bitcoin/bips/blob/master/bip-0340.mediawiki#Public_Key_Generation
-    let private_key = PrivateKey::from_slice(&pk_point[1..]).unwrap();
+    let address = H160::from_slice(&Keccak256::digest(&pk_point).as_slice()[12..]);
+
     // output
-    println!("Ethereum PrivateKey {:?}", encode(&pk_point[1..]));
-    println!("Ethereum Address: {}",private_key.address());
+    println!("Ethereum Address: {:?}", address);
     // see: https://eips.ethereum.org/EIPS/eip-155
     println!("Ethereum v sig value {}", encode((parity + chain_id * 2 + 35).to_be_bytes()));
 }
