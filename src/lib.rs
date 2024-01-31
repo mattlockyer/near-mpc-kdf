@@ -50,18 +50,28 @@ pub fn derive_key(public_key: PublicKey, epsilon: Scalar) -> PublicKey {
 }
 
 pub fn main() {
+    // ethereum mainnet: 1, sepolia testnet: 11155111
+    let chain_id: u32 = 1;
+    // your account
 	let account_id = "md1.testnet".to_string().try_into().unwrap();
+    // path to ethereum accounts and numbered offset of specific account to create
 	let path = ",ethereum,1";
     // mpc_public_key from: NEAR_ENV=testnet near view multichain-testnet-2.testnet public_key
     let mpc_public_key: near_sdk::PublicKey = "secp256k1:5Kwe7Ho7gicqBeTUGQLjKeRo87A3xyXjw1MbJVFe6GSiGzL4rK6i6Ycx8ksXJsFBPuxHv97U481HbM96KRYvbkX6".parse().unwrap();
 	let epsilon = derive_epsilon(&account_id, path);
-	let pk_point = derive_key(mpc_public_key.into_affine_point(), epsilon);
-
-    // dropping first byte 02 or 03 determines y sign, ignored by Bitcoin and Ethereum addresses
+	let pk_point = derive_key(mpc_public_key.into_affine_point(), epsilon).to_bytes();
+    // for the sig v value used in ecdsa recovery of public key from signatures
+    let parity = match pk_point.get(0).unwrap() {
+        0x02 => 0,
+        0x03 => 1,
+        _ => 0
+    };
+    // dropping first byte 02 or 03 ignored by Bitcoin and Ethereum public key addresses
     // https://github.com/bitcoin/bips/blob/master/bip-0340.mediawiki#Public_Key_Generation
-    let pk_bytes = &pk_point.to_bytes()[1..];
-    let private_key = PrivateKey::from_slice(pk_bytes).unwrap();
-
-    println!("Ethereum PrivateKey {:?}", encode(pk_bytes));
+    let private_key = PrivateKey::from_slice(&pk_point[1..]).unwrap();
+    // output
+    println!("Ethereum PrivateKey {:?}", encode(&pk_point[1..]));
     println!("Ethereum Address: {}",private_key.address());
+    // see: https://eips.ethereum.org/EIPS/eip-155
+    println!("Ethereum v sig value {}", encode((parity + chain_id * 2 + 35).to_be_bytes()));
 }
