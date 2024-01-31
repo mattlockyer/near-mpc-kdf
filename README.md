@@ -1,6 +1,16 @@
 # Generate mpc private key for near protocol
 
+## Concept Overview
+
+- Using Rust project (or some JS/TS in the future) a client generates an Ethereum private key, address and sig `v` value (for ECDSA recovery)
+- The client builds an Ethereum TX client side (Chain ID matters)
+- The client calls `sign` with their near account
+- An indexer picks up the `response` transaction
+- In the response is the `big_r` and `s` values for the Ethereum TX
+- The client can build a signed and RLP encoded Ethereum TX, and broadcast it to an Ethereum network
+
 ## Instructions
+*Steps 1 and 2 are already done for the current testnet contract, but this contract and your NEAR network may differ*
 
 1. How to get the MPC Public Key: `NEAR_ENV=[testnet/mainnet] near view [MPC_CONTRACT] public_key`
 (for testnet: `NEAR_ENV=testnet near view multichain-testnet-2.testnet public_key`)
